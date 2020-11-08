@@ -1,5 +1,8 @@
 const path = require(`path`);
-const HTMLplugin = require(`html-webpack-plugin`);
+const htmlWebpackPlugin = require(`html-webpack-plugin`);
+const miniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const webpack = require('webpack');
 
 const rules = [
     {
@@ -10,23 +13,50 @@ const rules = [
         }
     },
     {
+        test: /\.(png|woff|woff2|eot|ttf|svg|jpg|jpeg)$/,
+        loader: 'url-loader',
+    },
+    {
         test: /\.css$/,
         exclude: /node_modules/,
         use: ["style-loader", "css-loader"]
+    },
+    {
+        test: /\.scss$/,
+        use: [
+            { loader: miniCssExtractPlugin.loader },
+            "css-loader",
+            "sass-loader"
+        ]
     }
 ]
 
 
 module.exports = {
-    entry: path.join(__dirname, 'src', 'index.js'),
+    entry: [path.join(__dirname, 'src', 'index.js'), path.join(__dirname, 'src/stylesheets', 'app.scss')],
     output: {
-        filename: 'bundle.js',
+        publicPath: '/',
+        filename: `[name].[hash].js`,
         path: path.resolve(__dirname, './dist')
     },
     module: {rules},
+    devServer: {
+        contentBase: path.join(__dirname, "./public"),
+        historyApiFallback: true,
+        port: 9000,
+        open: true,
+        overlay: true,
+        hot: true, //hot module replacement
+    },
     plugins: [
-        new HTMLplugin({
-            template: "./public/index.html"
-        })
+        new CleanWebpackPlugin(),
+        new htmlWebpackPlugin({
+            template: path.resolve(__dirname, "src", "index.html")
+        }),
+        new miniCssExtractPlugin({
+            filename: `[name].[hash].css`,
+            chunkFilename: `[name].chunk.css`
+        }),
+        new webpack.HotModuleReplacementPlugin()
     ]
 }
