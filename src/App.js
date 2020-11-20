@@ -1,5 +1,5 @@
-import React, {Fragment} from "react";
-import { Route } from "react-router-dom";
+import React from "react";
+import { Route, Switch } from "react-router-dom";
 
 import Index from "./pages/Index";
 import About from "./pages/About";
@@ -8,12 +8,17 @@ import SignUp from "./pages/SignUp";
 
 const App = () => {
     return (
-        <Fragment>
+        <Switch>
             <Route exact path="/" component={Index} />
             <Route path="/about" component={About} />
             <Route path="/login" component={Login} />
             <Route path="/sign-up" component={SignUp} />
-        </Fragment>
+            <Route 
+            render={({location}) => (
+                <div></div>
+            )}
+            />
+        </Switch>
     )
 }
 
